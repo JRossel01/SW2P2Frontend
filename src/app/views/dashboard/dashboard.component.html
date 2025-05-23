@@ -1,0 +1,55 @@
+
+<h1>DASHBOARD</h1>
+<div class="filters">
+  <!-- Filtro de Doctor ID (mostrando nombres, enviando IDs) -->
+  <label for="doctorId">Doctor:</label>
+  <select id="doctorId" #doctorId>
+    <option value="">Todos</option>
+    <option *ngFor="let doctor of doctors" [value]="doctor.doctor_id">{{ doctor.doctor_name }}</option>
+  </select>
+
+  <!-- Filtro de Mes -->
+  <label for="mes">Mes:</label>
+  <select id="mes" #mes>
+    <option value="">Todos</option>
+    <option value="1">Enero</option>
+    <option value="2">Febrero</option>
+    <option value="3">Marzo</option>
+    <option value="4">Abril</option>
+    <option value="5">Mayo</option>
+    <option value="6">Junio</option>
+    <option value="7">Julio</option>
+    <option value="8">Agosto</option>
+    <option value="9">Septiembre</option>
+    <option value="10">Octubre</option>
+    <option value="11">Noviembre</option>
+    <option value="12">Diciembre</option>
+  </select>
+
+  <!-- Filtro de Año -->
+  <label for="anio">Año:</label>
+  <select id="anio" #anio>
+    <option value="">Todos</option>
+    <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+  </select>
+
+  <!-- Botón para aplicar filtros -->
+  <button (click)="applyFilters(doctorId.value, mes.value, anio.value)">Aplicar Filtros</button>
+</div>
+
+
+<!-- Gráfico de Barras -->
+<div style="display: block; width: 100%; margin-top: 20px;">
+  <plotly-plot *ngIf="graphData" [data]="graphData" [layout]="layout"></plotly-plot>
+</div>
+
+
+
+<div style="display: block; width: 100%; margin-top: 20px;">
+  <plotly-plot *ngIf="lineGraphData" [data]="lineGraphData" [layout]="lineLayout"></plotly-plot>
+</div>
+
+<!-- Gráfico de Pastel -->
+<div style="display: block; width: 100%; margin-top: 20px;">
+    <plotly-plot *ngIf="pieGraphData" [data]="pieGraphData" [layout]="pieLayout"></plotly-plot>
+  </div>

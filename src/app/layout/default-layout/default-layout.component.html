@@ -1,0 +1,53 @@
+<!--sidebar-->
+<c-sidebar #sidebar1="cSidebar" class="d-print-none sidebar sidebar-fixed border-end" colorScheme="dark" id="sidebar1"
+  visible>
+  <c-sidebar-header class="border-bottom">
+    <div class="sidebar-brand d-flex align-items-center justify-content-center" style="height: 32px;">
+      <!-- Icono -->
+      <div style="margin-right: 8px; display: flex; align-items: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 0 24 24" fill="#00ADB5" style="margin-top: 2px;">
+          <!-- Portapapeles -->
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14
+                  c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45
+                  1-1 1-1-.45-1-1 .45-1 1-1z"/>
+          
+          <!-- Cruz blanca centrada -->
+          <rect x="10.5" y="8.5" width="3" height="7" fill="white"/>
+          <rect x="8.5" y="10.5" width="7" height="3" fill="white"/>
+        </svg>
+      </div>
+
+      <!-- Texto DocHealth -->
+      <span style="font-size: 24px; font-weight: bold; padding-top: 5px;">
+        DocHealth
+      </span>
+    </div>
+  </c-sidebar-header>
+
+
+  <ng-scrollbar #scrollbar="ngScrollbar" (updated)="onScrollbarUpdate(scrollbar.state)" class="overflow"
+    pointerEventsMethod="scrollbar" visibility="hover">
+    <c-sidebar-nav #overflow [navItems]="navItems" dropdownMode="close" compact />
+  </ng-scrollbar>
+  @if (!sidebar1.narrow) {
+  <c-sidebar-footer cSidebarToggle="sidebar1" class="border-top d-none d-lg-flex" toggle="unfoldable"
+    style="cursor: pointer;">
+    <button cSidebarToggler aria-label="Toggle sidebar fold"></button>
+  </c-sidebar-footer>
+  }
+</c-sidebar>
+
+<!--main-->
+<div class="wrapper d-flex flex-column min-vh-100">
+  <!--app-header-->
+  <app-default-header [cShadowOnScroll]="'sm'" class="mb-4 d-print-none header header-sticky p-0 shadow-sm"
+    position="sticky" sidebarId="sidebar1" />
+  <!--app-body-->
+  <div class="body flex-grow-1">
+    <c-container class="h-auto px-4" style="width: 90%; max-width: none;">
+      <router-outlet />
+    </c-container>
+  </div>
+  <!--app footer-->
+  <app-default-footer />
+</div>
