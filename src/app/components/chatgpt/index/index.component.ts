@@ -12,6 +12,8 @@ import {
 import {
   GET_ALL_DOCTORS_WITH_SCHEDULES,
   GET_ALL_APPOINTMENTS,
+  GET_MEDICAL_RECORD_BY_PATIENT,
+  FIND_CONSULTS_BY_PATIENT,
 } from '../../../graphql/queries.graphql';
 
 @Component({
@@ -35,6 +37,8 @@ export class IndexComponent {
   doctorsData: any[] = [];
   appointmentCreated: boolean = false;
   appointmentsData: any[] = [];
+  medicalRecordData: any = null;
+  consultHistoryData: any[] = [];
   patientId: number | null = parseInt(
     localStorage.getItem('patientId') || '0',
     10
@@ -116,6 +120,49 @@ export class IndexComponent {
       this.appointmentsData = appointmentsData?.getAllAppointments || [];
     } catch (error) {
       console.error('Error al obtener los datos de doctores y citas:', error);
+    }
+  }
+
+  async fetchMedicalData() {
+    if (!this.jwt || !this.patientId || this.patientId <= 0) {
+      console.error('JWT o patientId no disponible.');
+      return;
+    }
+
+    try {
+      const medicalRecordResult = await this.apollo
+        .query({
+          query: GET_MEDICAL_RECORD_BY_PATIENT,
+          variables: {
+            patientId: this.patientId,
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${this.jwt}`,
+            },
+          },
+        })
+        .toPromise();
+
+      this.medicalRecordData = (medicalRecordResult?.data as any)?.getMedicalRecordByPatient || null;
+
+      const consultsResult = await this.apollo
+        .query({
+          query: FIND_CONSULTS_BY_PATIENT,
+          variables: {
+            patientId: this.patientId,
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${this.jwt}`,
+            },
+          },
+        })
+        .toPromise();
+
+      this.consultHistoryData = (consultsResult?.data as any)?.findConsultsByPatient || [];
+    } catch (error) {
+      console.error('Error al obtener historia clínica y consultas:', error);
     }
   }
 
@@ -314,6 +361,7 @@ Al proporcionar los horarios disponibles para el paciente, asegúrate de excluir
     });
 
     // Construir un contexto basado en el historial de mensajes
+    await this.fetchMedicalData();
     let conversationContext = 'Contexto acumulado de la conversación previa:\n';
     for (const message of this.messages) {
       conversationContext += `${
@@ -325,14 +373,23 @@ Al proporcionar los horarios disponibles para el paciente, asegúrate de excluir
     const prompt = `
 ${conversationContext}
 
-Con base en esta conversación, genera una breve descripción de los síntomas observados y un posible diagnóstico preliminar basado únicamente en la siguiente razón proporcionada por el paciente. 
-Esta preevaluación se proporciona como un apoyo para el doctor, y debe limitarse estrictamente a los datos solicitados. No agregues recomendaciones adicionales, aclaraciones sobre la naturaleza del diagnóstico ni ningún texto fuera del formato indicado. 
-Proporciona solo los datos específicos en el siguiente formato:
-Razón: ${reason}
+Tienes acceso a la siguiente historia clínica del paciente (medicalRecordData):
+${JSON.stringify(this.medicalRecordData)}
+
+También tienes acceso al historial de consultas anteriores del paciente (consultHistoryData):
+${JSON.stringify(this.consultHistoryData)}
+
+Con base en esta información, y en la razón proporcionada por el paciente, genera una breve descripción de los síntomas observados y un posible diagnóstico preliminar.
+
+Esta preevaluación se proporciona como un apoyo para el doctor, y debe limitarse estrictamente a los datos solicitados. No agregues recomendaciones adicionales, aclaraciones sobre la naturaleza del diagnóstico ni ningún texto fuera del formato indicado.
+
+Razón proporcionada por el paciente: ${reason}
+
 Responde estrictamente en el siguiente formato:
 - Síntomas: [Descripción breve y clara de los síntomas relevantes al motivo proporcionado]
-- Posible Diagnóstico: [Diagnóstico preliminar basado en la razón proporcionada, y una breve descripcion del por que]
-Evita incluir declaraciones adicionales, recomendaciones generales, advertencias o textos sobre la naturaleza del diagnóstico, tambien formatos como ** o negritas.
+- Posible Diagnóstico: [Diagnóstico preliminar basado en la historia clínica, el historial y la razón actual. Incluye una breve justificación.]
+
+Evita incluir declaraciones adicionales, recomendaciones generales, advertencias o formatos como ** o negritas.
 `;
     try {
       const response = await openai.chat.completions.create({
