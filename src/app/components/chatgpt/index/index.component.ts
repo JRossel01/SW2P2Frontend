@@ -259,6 +259,7 @@ Tu función principal es:
    - Finalmente, vuelve a revisar si no existen citas en ese horario, y revisa los datos que van a ser enviados, que esten todos completos.
 
 Al proporcionar los horarios disponibles para el paciente, asegúrate de excluir cualquier horario ocupado según la lista de citas existentes en "appointmentsData", y proporciona solo los horarios disponibles en intervalos de 20 minutos.
+Te lo repito, revisa estrictamente contra la lista de citas existentes para determinar los horarios disponibles. No debes sugerir horarios que ya estén ocupados por otras citas.
 `;
 
     if (this.messages.length === 1) {

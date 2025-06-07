@@ -31,20 +31,21 @@
 
   <!-- Entrada de texto para nueva pregunta -->
   <!-- Textarea arriba -->
-<div class="mb-2" *ngIf="!isListening">
+<!-- Textarea (oculto si la cita ya fue creada) -->
+<div class="mb-2" *ngIf="!appointmentCreated && !isListening">
   <textarea
     id="userInput"
     [(ngModel)]="textInput"
     placeholder="Describe tu problema y tu disponibilidad de horario aquí..."
     rows="6"
     class="form-control"
-    [disabled]="appointmentCreated || isTyping"
+    [disabled]="isTyping"
   ></textarea>
 </div>
 
-<!-- Botones Enviar + Habla en la misma fila -->
-<div class="d-flex gap-2 mb-3">
-  <button class="btn btn-primary" (click)="search()" [disabled]="appointmentCreated || isTyping">
+<!-- Botones Enviar + Habla (ocultos si la cita ya fue creada) -->
+<div class="d-flex gap-2 mb-3" *ngIf="!appointmentCreated">
+  <button class="btn btn-primary" (click)="search()" [disabled]="isTyping">
     Enviar
   </button>
 
@@ -56,7 +57,11 @@
   >
     {{ isListening ? '🎙️ Escuchando...' : '🎤 Habla' }}
   </button>
+</div>
 
+<!-- Mensaje de confirmación -->
+<div class="alert alert-success" *ngIf="appointmentCreated">
+  ✅ La cita ha sido registrada con éxito.
 </div>
 
   <!-- Botón para crear una nueva cita -->
