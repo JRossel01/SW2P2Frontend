@@ -1,12 +1,12 @@
 <div class="container mt-5">
   <header class="d-flex align-items-center mb-4">
     <div class="me-3 d-flex align-items-center">
-      <span class="fs-4 fw-bold">Medi<span class="text-danger">Core</span></span>
+      <span class="fs-4 fw-bold">Doc<span class="text-danger">Health</span></span>
       <div class="ms-2 logo-symbol"></div>
     </div>
     <div>
       <h1 class="h3">Bienvenido</h1>
-      <p>Soy el Generador de Citas Automático. Cuéntame tu problema y tu horario disponible.</p>
+      <p>Soy el Generador de Citas Automático. Cuéntame tu problema, estoy para ayudarte.</p>
     </div>
   </header>
 
@@ -30,20 +30,37 @@
   </div>
 
   <!-- Entrada de texto para nueva pregunta -->
-  <div class="mb-3" *ngIf="!appointmentCreated">
-    <textarea
-      id="userInput"
-      [(ngModel)]="textInput"
-      placeholder="Describe tu problema y tu disponibilidad de horario aquí..."
-      rows="6"
-      class="form-control mb-2"
-      [disabled]="appointmentCreated || isTyping"
-    ></textarea>
-    <button class="btn btn-primary mb-3" (click)="search()" [disabled]="appointmentCreated || isTyping">Enviar</button>
-  </div>
+  <!-- Textarea arriba -->
+<div class="mb-2" *ngIf="!isListening">
+  <textarea
+    id="userInput"
+    [(ngModel)]="textInput"
+    placeholder="Describe tu problema y tu disponibilidad de horario aquí..."
+    rows="6"
+    class="form-control"
+    [disabled]="appointmentCreated || isTyping"
+  ></textarea>
+</div>
+
+<!-- Botones Enviar + Habla en la misma fila -->
+<div class="d-flex gap-2 mb-3">
+  <button class="btn btn-primary" (click)="search()" [disabled]="appointmentCreated || isTyping">
+    Enviar
+  </button>
+
+  <button
+    class="btn"
+    [ngClass]="isListening ? 'btn-outline-secondary' : 'btn-outline-secondary'"
+    (click)="startVoiceInput()"
+    [disabled]="isTyping || isListening"
+  >
+    {{ isListening ? '🎙️ Escuchando...' : '🎤 Habla' }}
+  </button>
+
+</div>
 
   <!-- Botón para crear una nueva cita -->
   <button *ngIf="appointmentCreated" class="btn btn-secondary" (click)="resetAppointmentCreation()">
     Crear Nueva Cita
   </button>
-</div>
+

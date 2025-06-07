@@ -20,6 +20,7 @@
     background-color: transparent;
     display: inline-block;
 
+
     &:before,
     &:after {
       content: '';
@@ -44,3 +45,9 @@
     }
   }
 }
+
+.invisible-text {
+    color: transparent;
+    caret-color: black; // sigue mostrando el cursor
+    background-color: inherit;
+  }

@@ -43,6 +43,8 @@ export class IndexComponent {
     localStorage.getItem('patientId') || '0',
     10
   );
+  isListening: boolean = false;
+  recognition: any = null;
 
   constructor(private apollo: Apollo) {}
 
@@ -165,6 +167,39 @@ export class IndexComponent {
       console.error('Error al obtener historia clínica y consultas:', error);
     }
   }
+
+  startVoiceInput() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Este navegador no admite reconocimiento de voz.');
+      return;
+    }
+
+    this.recognition = new SpeechRecognition();
+    this.recognition.lang = 'es-ES'; // Español
+    this.recognition.interimResults = false;
+    this.recognition.maxAlternatives = 1;
+
+    this.isListening = true;
+
+    this.recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      this.textInput = transcript; // Escribe en el campo, pero no lo muestra aún
+      this.isListening = false;
+    };
+
+    this.recognition.onerror = (event: any) => {
+      console.error('Error en reconocimiento de voz:', event.error);
+      this.isListening = false;
+    };
+
+    this.recognition.onend = () => {
+      this.isListening = false;
+    };
+
+    this.recognition.start();
+  }
+
 
   async search() {
     if (!this.textInput.trim()) {
